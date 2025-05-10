@@ -1,0 +1,52 @@
+# 1. Requests Over Time (Line Chart)
+sourcetype="<your_source_name>" 
+| timechart count by status
+
+# 2. Top 10 Source IPs (Bar Chart)
+sourcetype="<your_source_name>" 
+| top limit=10 src_ip
+
+# 3. HTTP Status Breakdown (Pie Chart)
+sourcetype="<your_source_name>" 
+| stats count by status
+
+# 4. Error Logs Over Time (4xx/5xx) - Area Chart
+sourcetype="<your_source_name>" status>=400 
+| timechart count by status
+
+# 5. Most Requested URLs (Table)
+sourcetype="<your_source_name>" 
+| rex field=_raw "\"(?<method>GET|POST|PUT|DELETE) (?<url>/[^\"]*)" 
+| stats count by url 
+| sort -count
+
+# 6. Detailed Log Table with Fields
+sourcetype="<your_source_name>" 
+| rex field=_raw "^(?<src_ip>\d+\.\d+\.\d+\.\d+) - - \[(?<timestamp>[^\]]+)\] \"(?<method>\w+) (?<url>/[^\"]*) HTTP.*\" (?<status>\d+) (?<size>\d+)"
+| table _time src_ip method url status size
+
+# 7. Filter: Only Error Logs (4xx/5xx)
+sourcetype="<your_source_name>" 
+| search status>=400 
+| rex field=_raw "^(?<src_ip>\d+\.\d+\.\d+\.\d+)"
+| table _time src_ip status url
+
+# 8. Filter: Only Successful Requests (200 OK)
+sourcetype="<your_source_name>" 
+| search status=200 
+| rex field=_raw "^(?<src_ip>\d+\.\d+\.\d+\.\d+)"
+| table _time src_ip url status
+
+# 9. Custom Field Extraction - src_ip, src_port, dst_ip, dst_port (if present in raw)
+sourcetype="<your_source_name>" 
+| rex field=_raw "src_ip=(?<src_ip>\d+\.\d+\.\d+\.\d+)\s+src_port=(?<src_port>\d+)\s+dst_ip=(?<dst_ip>\d+\.\d+\.\d+\.\d+)\s+dst_port=(?<dst_port>\d+)"
+| table _time src_ip src_port dst_ip dst_port status
+
+# 10. Count of Requests by Method Type (GET, POST, etc.)
+sourcetype="<your_source_name>" 
+| rex field=_raw "\"(?<method>GET|POST|PUT|DELETE) " 
+| stats count by method
+
+# 11. Requests Per Host (if host field exists)
+sourcetype="<your_source_name>" 
+| stats count by host
