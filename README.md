@@ -15,7 +15,7 @@ This project demonstrates how to use Splunk to analyze and visualize system log 
 - Identified patterns from log data using `status`, `ip`, and `time`
 
 ## 📊 Screenshots
-![Dashboard](screenshots/Requested URLs.png)
+![Dashboard](screenshots/RequestedURLs.png)
 
 ## 🛠 Skills Used
 - Splunk Core (Free Trial)
